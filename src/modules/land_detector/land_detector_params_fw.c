@@ -32,6 +32,17 @@
  ****************************************************************************/
 
 /**
+walk
+max_vxy: 0.894
+max_vz: 0.457
+max_veli: 10.59
+
+simulation fly
+max_vxy: 1.977
+max_vz: 0.390
+max_veli: 9.017
+*/
+/**
  * Fixedwing max horizontal velocity
  *
  * Maximum horizontal velocity allowed in the landed state (m/s)
@@ -40,10 +51,10 @@
  * @min 0.5
  * @max 10
  * @decimal 1
- *
+ * walk max vxy: 0.85
  * @group Land Detector
  */
-PARAM_DEFINE_FLOAT(LNDFW_VEL_XY_MAX, 5.0f);
+PARAM_DEFINE_FLOAT(LNDFW_VEL_XY_MAX, 1.8f);
 
 /**
  * Fixedwing max climb rate
@@ -51,13 +62,21 @@ PARAM_DEFINE_FLOAT(LNDFW_VEL_XY_MAX, 5.0f);
  * Maximum vertical velocity allowed in the landed state (m/s up and down)
  *
  * @unit m/s
+<<<<<<< HEAD
  * @min 0.1
+=======
+ * @min 1
+>>>>>>> dev
  * @max 20
  * @decimal 1
- *
+ * walk max vz: 0.18
  * @group Land Detector
  */
+<<<<<<< HEAD
 PARAM_DEFINE_FLOAT(LNDFW_VEL_Z_MAX, 3.0f);
+=======
+PARAM_DEFINE_FLOAT(LNDFW_VEL_Z_MAX, 1.0f);
+>>>>>>> dev
 
 /**
  * Fixedwing max horizontal acceleration
@@ -68,10 +87,14 @@ PARAM_DEFINE_FLOAT(LNDFW_VEL_Z_MAX, 3.0f);
  * @min 2
  * @max 15
  * @decimal 1
- *
+ * walk max: 7.9
  * @group Land Detector
  */
+<<<<<<< HEAD
 PARAM_DEFINE_FLOAT(LNDFW_XYACC_MAX, 8.0f);
+=======
+PARAM_DEFINE_FLOAT(LNDFW_VELI_MAX, 10.0f);
+>>>>>>> dev
 
 /**
  * Airspeed max
@@ -85,4 +108,4 @@ PARAM_DEFINE_FLOAT(LNDFW_XYACC_MAX, 8.0f);
  *
  * @group Land Detector
  */
-PARAM_DEFINE_FLOAT(LNDFW_AIRSPD_MAX, 8.00f);
+PARAM_DEFINE_FLOAT(LNDFW_AIRSPD_MAX, 4.00f);

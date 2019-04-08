@@ -31,18 +31,10 @@
 #
 ############################################################################
 px4_add_module(
-	MODULE modules__land_detector
-	MAIN land_detector
-	STACK_MAIN 1200
-	COMPILE_FLAGS
-	SRCS
-		land_detector_main.cpp
-		LandDetector.cpp
-		MulticopterLandDetector.cpp
-		FixedwingLandDetector.cpp
-                FlapwingLandDetector.cpp
-		VtolLandDetector.cpp
-		RoverLandDetector.cpp
-	DEPENDS
-	)
-
+        MODULE examples__land_data
+        MAIN land_data
+        STACK_MAIN 2000
+        SRCS
+                land_data.cpp
+        DEPENDS
+        )

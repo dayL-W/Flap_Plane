@@ -42,6 +42,26 @@ namespace sdp3x_airspeed
 {
 SDP3X *g_dev = nullptr;
 
+<<<<<<< HEAD
+=======
+int bus_options[] = {
+#ifdef PX4_I2C_BUS_EXPANSION
+	PX4_I2C_BUS_EXPANSION,
+#endif
+#ifdef PX4_I2C_BUS_EXPANSION1
+	PX4_I2C_BUS_EXPANSION1,
+#endif
+#ifdef PX4_I2C_BUS_EXPANSION2
+	PX4_I2C_BUS_EXPANSION2,
+#endif
+#ifdef PX4_I2C_BUS_ONBOARD
+	PX4_I2C_BUS_ONBOARD,
+#endif
+};
+
+#define NUM_BUS_OPTIONS (sizeof(bus_options)/sizeof(bus_options[0]))
+
+>>>>>>> dev
 int start();
 int start_bus(uint8_t i2c_bus);
 int stop();
@@ -55,6 +75,7 @@ int reset();
  * sensors are detected.
  *
  */
+<<<<<<< HEAD
 int
 start()
 {
@@ -74,6 +95,27 @@ start()
  * or failed to detect the sensor.
  */
 int
+=======
+int
+start()
+{
+	for (unsigned i = 0; i < NUM_BUS_OPTIONS; i++) {
+		if (start_bus(bus_options[i]) == PX4_OK) {
+			return PX4_OK;
+		}
+	}
+
+	return PX4_ERROR;
+}
+
+/**
+ * Start the driver on a specific bus.
+ *
+ * This function call only returns once the driver is up and running
+ * or failed to detect the sensor.
+ */
+int
+>>>>>>> dev
 start_bus(uint8_t i2c_bus)
 {
 	int fd = -1;

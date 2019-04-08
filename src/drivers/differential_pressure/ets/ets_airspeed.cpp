@@ -239,6 +239,26 @@ namespace ets_airspeed
 
 ETSAirspeed	*g_dev = nullptr;
 
+<<<<<<< HEAD
+=======
+int bus_options[] = {
+#ifdef PX4_I2C_BUS_EXPANSION
+	PX4_I2C_BUS_EXPANSION,
+#endif
+#ifdef PX4_I2C_BUS_EXPANSION1
+	PX4_I2C_BUS_EXPANSION1,
+#endif
+#ifdef PX4_I2C_BUS_EXPANSION2
+	PX4_I2C_BUS_EXPANSION2,
+#endif
+#ifdef PX4_I2C_BUS_ONBOARD
+	PX4_I2C_BUS_ONBOARD,
+#endif
+};
+
+#define NUM_BUS_OPTIONS (sizeof(bus_options)/sizeof(bus_options[0]))
+
+>>>>>>> dev
 int start();
 int start_bus(int i2c_bus);
 int stop();
@@ -256,8 +276,13 @@ int info();
 int
 start()
 {
+<<<<<<< HEAD
 	for (unsigned i = 0; i < NUM_I2C_BUS_OPTIONS; i++) {
 		if (start_bus(i2c_bus_options[i]) == PX4_OK) {
+=======
+	for (unsigned i = 0; i < NUM_BUS_OPTIONS; i++) {
+		if (start_bus(bus_options[i]) == PX4_OK) {
+>>>>>>> dev
 			return PX4_OK;
 		}
 	}

@@ -424,6 +424,26 @@ PX4FMU::init()
 	/* initialize PWM limit lib */
 	pwm_limit_init(&_pwm_limit);
 
+<<<<<<< HEAD
+=======
+#ifdef RC_SERIAL_PORT
+
+#  ifdef RF_RADIO_POWER_CONTROL
+	// power radio on
+	RF_RADIO_POWER_CONTROL(true);
+#  endif
+	_vehicle_cmd_sub = orb_subscribe(ORB_ID(vehicle_command));
+	// dsm_init sets some file static variables and returns a file descriptor
+	_rcs_fd = dsm_init(RC_SERIAL_PORT);
+	// assume SBUS input
+	sbus_config(_rcs_fd, false);
+#  ifdef GPIO_PPM_IN
+	// disable CPPM input by mapping it away from the timer capture input
+	px4_arch_unconfiggpio(GPIO_PPM_IN);
+#  endif
+#endif
+
+>>>>>>> dev
 	// Getting initial parameter values
 	update_params();
 

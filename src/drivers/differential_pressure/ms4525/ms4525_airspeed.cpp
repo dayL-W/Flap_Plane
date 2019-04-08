@@ -369,8 +369,30 @@ namespace meas_airspeed
 
 MEASAirspeed	*g_dev = nullptr;
 
+<<<<<<< HEAD
 int start();
 int start_bus(int i2c_bus, int address);
+=======
+int bus_options[] = {
+#ifdef PX4_I2C_BUS_EXPANSION
+	PX4_I2C_BUS_EXPANSION,
+#endif
+#ifdef PX4_I2C_BUS_EXPANSION1
+	PX4_I2C_BUS_EXPANSION1,
+#endif
+#ifdef PX4_I2C_BUS_EXPANSION2
+	PX4_I2C_BUS_EXPANSION2,
+#endif
+#ifdef PX4_I2C_BUS_ONBOARD
+	PX4_I2C_BUS_ONBOARD,
+#endif
+};
+
+#define NUM_BUS_OPTIONS (sizeof(bus_options)/sizeof(bus_options[0]))
+
+int start();
+int start_bus(int i2c_bus);
+>>>>>>> dev
 int stop();
 int reset();
 
@@ -385,8 +407,13 @@ int reset();
 int
 start()
 {
+<<<<<<< HEAD
 	for (unsigned i = 0; i < NUM_I2C_BUS_OPTIONS; i++) {
 		if (start_bus(i2c_bus_options[i], I2C_ADDRESS_MS4525DO) == PX4_OK) {
+=======
+	for (unsigned i = 0; i < NUM_BUS_OPTIONS; i++) {
+		if (start_bus(bus_options[i]) == PX4_OK) {
+>>>>>>> dev
 			return PX4_OK;
 		}
 	}
@@ -402,7 +429,11 @@ start()
  * or failed to detect the sensor.
  */
 int
+<<<<<<< HEAD
 start_bus(int i2c_bus, int address)
+=======
+start_bus(int i2c_bus)
+>>>>>>> dev
 {
 	int fd;
 
@@ -513,11 +544,17 @@ ms4525_airspeed_main(int argc, char *argv[])
 	int ch;
 	const char *myoptarg = nullptr;
 
+<<<<<<< HEAD
 	int device_type = DEVICE_TYPE_MS4525;
 
 	bool start_all = false;
 
 	while ((ch = px4_getopt(argc, argv, "ab:T:", &myoptind, &myoptarg)) != EOF) {
+=======
+	bool start_all = false;
+
+	while ((ch = px4_getopt(argc, argv, "ab:", &myoptind, &myoptarg)) != EOF) {
+>>>>>>> dev
 		switch (ch) {
 		case 'b':
 			i2c_bus = atoi(myoptarg);
@@ -527,10 +564,13 @@ ms4525_airspeed_main(int argc, char *argv[])
 			start_all = true;
 			break;
 
+<<<<<<< HEAD
 		case 'T':
 			device_type = atoi(myoptarg);
 			break;
 
+=======
+>>>>>>> dev
 		default:
 			meas_airspeed_usage();
 			return 0;
@@ -549,12 +589,19 @@ ms4525_airspeed_main(int argc, char *argv[])
 		if (start_all) {
 			return meas_airspeed::start();
 
+<<<<<<< HEAD
 		} else if (device_type == DEVICE_TYPE_MS4515) {
 			return meas_airspeed::start_bus(i2c_bus, I2C_ADDRESS_MS4515DO);
 
 		} else if (device_type == DEVICE_TYPE_MS4525) {
 			return meas_airspeed::start_bus(i2c_bus, I2C_ADDRESS_MS4525DO);
 		}
+=======
+		} else {
+			return meas_airspeed::start_bus(i2c_bus);
+		}
+
+>>>>>>> dev
 	}
 
 	/*

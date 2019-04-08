@@ -82,6 +82,7 @@
 #include <uORB/topics/telemetry_status.h>
 #include <uORB/topics/transponder_report.h>
 #include <uORB/topics/vehicle_attitude.h>
+#include <uORB/topics/vehicle_filter_attitude.h>
 #include <uORB/topics/vehicle_attitude_setpoint.h>
 #include <uORB/topics/vehicle_command.h>
 #include <uORB/topics/vehicle_control_mode.h>
@@ -3117,7 +3118,74 @@ protected:
 		return false;
 	}
 };
+class MavlinkStreamFilterAngle : public MavlinkStream
+{
+public:
+    const char *get_name() const
+    {
+        return MavlinkStreamFilterAngle::get_name_static();
+    }
 
+    static const char *get_name_static()
+    {
+        return "Filter_Angle";
+    }
+
+    static uint16_t get_id_static()
+    {
+        return MAVLINK_MSG_ID_Filter_Angle;
+    }
+
+    uint16_t get_id()
+    {
+        return get_id_static();
+    }
+
+    static MavlinkStream *new_instance(Mavlink *mavlink)
+    {
+        return new MavlinkStreamFilterAngle(mavlink);
+    }
+
+    unsigned get_size()
+    {
+        return (_debug_time > 0) ? MAVLINK_MSG_ID_NAMED_VALUE_FLOAT_LEN + MAVLINK_NUM_NON_PAYLOAD_BYTES : 0;
+    }
+
+private:
+    MavlinkOrbSubscription *_debug_sub;
+    uint64_t _debug_time;
+
+    /* do not allow top copying this class */
+    MavlinkStreamFilterAngle(MavlinkStreamFilterAngle &) = delete;
+    MavlinkStreamFilterAngle &operator = (const MavlinkStreamFilterAngle &) = delete;
+
+protected:
+    explicit MavlinkStreamFilterAngle(Mavlink *mavlink) : MavlinkStream(mavlink),
+        _debug_sub(_mavlink->add_orb_subscription(ORB_ID(vehicle_filter_attitude))),
+        _debug_time(0)
+    {}
+
+    bool send(const hrt_abstime t)
+    {
+        struct vehicle_filter_attitude_s debug;
+
+        if (_debug_sub->update(&_debug_time, &debug)) {
+            mavlink_named_value_float_t msg = {};
+
+            msg.time_boot_ms = debug.timestamp_ms;
+            memcpy(msg.name, debug.key, sizeof(msg.name));
+            /* enforce null termination */
+            msg.name[sizeof(msg.name) - 1] = '\0';
+            msg.value = debug.value;
+
+            mavlink_msg_named_value_float_send_struct(_mavlink->get_channel(), &msg);
+
+            return true;
+        }
+
+        return false;
+    }
+};
 class MavlinkStreamNamedValueFloat : public MavlinkStream
 {
 public:
@@ -4158,6 +4226,7 @@ static const StreamListItem streams_list[] = {
 	StreamListItem(&MavlinkStreamActuatorControlTarget<2>::new_instance, &MavlinkStreamActuatorControlTarget<2>::get_name_static, &MavlinkStreamActuatorControlTarget<2>::get_id_static),
 	StreamListItem(&MavlinkStreamActuatorControlTarget<3>::new_instance, &MavlinkStreamActuatorControlTarget<3>::get_name_static, &MavlinkStreamActuatorControlTarget<3>::get_id_static),
 	StreamListItem(&MavlinkStreamNamedValueFloat::new_instance, &MavlinkStreamNamedValueFloat::get_name_static, &MavlinkStreamNamedValueFloat::get_id_static),
+    StreamListItem(&MavlinkStreamFilterAngle::new_instance, &MavlinkStreamFilterAngle::get_name_static, &MavlinkStreamFilterAngle::get_id_static),
 	StreamListItem(&MavlinkStreamDebug::new_instance, &MavlinkStreamDebug::get_name_static, &MavlinkStreamDebug::get_id_static),
 	StreamListItem(&MavlinkStreamDebugVect::new_instance, &MavlinkStreamDebugVect::get_name_static, &MavlinkStreamDebugVect::get_id_static),
 	StreamListItem(&MavlinkStreamNavControllerOutput::new_instance, &MavlinkStreamNavControllerOutput::get_name_static, &MavlinkStreamNavControllerOutput::get_id_static),

@@ -2066,6 +2066,7 @@ Mavlink::task_main(int argc, char *argv[])
 		configure_stream("HOME_POSITION", 0.5f);
 		configure_stream("LOCAL_POSITION_NED", 30.0f);
 		configure_stream("NAMED_VALUE_FLOAT", 10.0f);
+        configure_stream("Filter_Angle", 10.0f);
 		configure_stream("NAV_CONTROLLER_OUTPUT", 10.0f);
 		configure_stream("OPTICAL_FLOW_RAD", 10.0f);
 		configure_stream("PING", 1.0f);
@@ -2126,6 +2127,7 @@ Mavlink::task_main(int argc, char *argv[])
 		configure_stream("LOCAL_POSITION_NED", 30.0f);
 		configure_stream("MANUAL_CONTROL", 5.0f);
 		configure_stream("NAMED_VALUE_FLOAT", 50.0f);
+        configure_stream("Filter_Angle", 50.0f);
 		configure_stream("NAV_CONTROLLER_OUTPUT", 10.0f);
 		configure_stream("OPTICAL_FLOW_RAD", 10.0f);
 		configure_stream("PING", 1.0f);
@@ -2153,6 +2155,7 @@ Mavlink::task_main(int argc, char *argv[])
 		configure_stream("GLOBAL_POSITION_INT", 5.0f);
 		configure_stream("HOME_POSITION", 0.1f);
 		configure_stream("NAMED_VALUE_FLOAT", 1.0f);
+        configure_stream("Filter_Angle", 1.0f);
 		configure_stream("RC_CHANNELS", 0.5f);
 		configure_stream("SYS_STATUS", 0.1f);
 		configure_stream("VFR_HUD", 1.0f);

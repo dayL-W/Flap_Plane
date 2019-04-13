@@ -31,7 +31,7 @@ set(config_module_list
 	#drivers/mb12xx
 	#drivers/mkblctrl
 	drivers/imu/mpu6000
-	drivers/imu/mpu9250
+	#drivers/imu/mpu9250
 	#drivers/oreoled
 	#drivers/protocol_splitter
 	drivers/pwm_input
@@ -47,7 +47,7 @@ set(config_module_list
 	drivers/vmount
 
 	# distance sensors
-	drivers/distance_sensor/ll40ls
+	#drivers/distance_sensor/ll40ls
 	#drivers/distance_sensor/mb12xx
 	#drivers/distance_sensor/sf0x
 	#drivers/distance_sensor/sf1xx
@@ -142,7 +142,7 @@ set(config_module_list
 	#
 	# OBC challenge
 	#
-        examples/bottle_drop
+	#examples/bottle_drop
 
 	#
 	# Rover apps
@@ -160,8 +160,8 @@ set(config_module_list
 
 	# Tutorial code from
 	# https://px4.io/dev/px4_simple_app
-        examples/px4_simple_app
-        examples/px4_daemon_app
+	#examples/px4_simple_app
+	#examples/px4_daemon_app
         examples/get_land_state
         examples/get_rc
         examples/filter_angle
@@ -172,11 +172,11 @@ set(config_module_list
 
 	# Tutorial code from
 	# https://px4.io/dev/example_fixedwing_control
-        examples/fixedwing_control
+	#examples/fixedwing_control
 
 	# Hardware test
-        examples/hwtest
+	#examples/hwtest
 
         #land data
-        examples/land_data
+	#examples/land_data
 )

@@ -42,15 +42,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <px4_posix.h>
 #include <px4_config.h>
 #include <nuttx/sched.h>
-
+#include <drivers/drv_hrt.h>
+#include <mathlib/mathlib.h>
+#include <matrix/math.hpp>
 #include <px4_tasks.h>
 #include <systemlib/err.h>
 #include <uORB/uORB.h>
 #include <uORB/topics/debug_key_value.h>
 #include <uORB/topics/vehicle_filter_attitude.h>
+#include <uORB/topics/vehicle_attitude.h>
+#include <queue>
 static bool thread_should_exit = false;		/**< daemon exit flag */
 static bool thread_running = false;		/**< daemon status flag */
 static int daemon_task;				/**< Handle of daemon task / thread */
@@ -58,7 +62,7 @@ static int daemon_task;				/**< Handle of daemon task / thread */
 /**
  * daemon management function.
  */
-__EXPORT int filter_angle_main(int argc, char *argv[]);
+extern "C" __EXPORT int filter_angle_main(int argc, char *argv[]);
 
 /**
  * Mainloop of daemon.
@@ -135,22 +139,49 @@ int filter_angle_main(int argc, char *argv[])
 
 int filter_angle_thread_main(int argc, char *argv[])
 {
-    //订阅角度
 
+    //订阅角度
+    int atti_sub_fd = orb_subscribe(ORB_ID(vehicle_attitude));
+    int error_counter = 0;
+
+    px4_pollfd_struct_t fds[1];
+    fds[0].fd = atti_sub_fd;
+    fds[0].events = POLLIN;
     //公告滤波后的角度
-    struct vehicle_filter_attitude_s fa_dgb ={.key = "angle", .value=0.0f};
-    orb_advert_t pub_dbg = orb_advertise(ORB_ID(vehicle_filter_attitude), &fa_dgb);
-    float32 value_counter = 0;
+    //struct vehicle_filter_attitude_s fa_dgb ={.key = "filter", .value=0.0f, .rollspeed=0.0f};
+    struct debug_key_value_s fa_dgb ={0,0,0,"filter"};
+
+    orb_advert_t pub_dbg = orb_advertise(ORB_ID(debug_key_value), &fa_dgb);
 	warnx("[daemon] starting\n");
 
 	thread_running = true;
 
 	while (!thread_should_exit) {
-        fa_dgb.value = value_counter;
-        orb_publish(ORB_ID(vehicle_filter_attitude), pub_dbg, &fa_dgb);
-        value_counter++;
-        warnx("hello\n");
-        usleep(500000);
+        int poll_ret = px4_poll(fds, 1, 1000);
+
+        if (poll_ret == 0) {
+            PX4_ERR("Got no data within a second");
+
+        } else if (poll_ret < 0) {
+            if (error_counter < 10 || error_counter % 50 == 0) {
+                PX4_ERR("ERROR return value from poll(): %d", poll_ret);
+            }
+            error_counter++;
+        } else {
+            if (fds[0].revents & POLLIN) {
+                uint64_t timestamp_us = hrt_absolute_time();
+                uint32_t timestamp_ms = timestamp_us / 1000;
+                struct vehicle_attitude_s raw;
+                /* copy sensors raw data into local buffer */
+                orb_copy(ORB_ID(vehicle_attitude), atti_sub_fd, &raw);
+                matrix::Eulerf euler = matrix::Quatf(raw.q);
+
+                fa_dgb.timestamp_ms = timestamp_ms;
+                fa_dgb.value = (float)0.92*fa_dgb.value + (float)0.08*euler.phi();
+                //fa_dgb.value = (float)0.92*fa_dgb.value + (float)0.08*euler.phi();
+                orb_publish(ORB_ID(debug_key_value), pub_dbg, &fa_dgb);
+            }
+        }
 	}
 
 	warnx("[daemon] exiting.\n");

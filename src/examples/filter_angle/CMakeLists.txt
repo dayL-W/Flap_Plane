@@ -35,7 +35,7 @@ px4_add_module(
 	MAIN filter_angle
 	STACK_MAIN 1200
 	SRCS
-		filter_angle.c
+                filter_angle.cpp
 	DEPENDS
 		platforms__common
 	)

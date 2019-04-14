@@ -3148,7 +3148,7 @@ public:
 
     unsigned get_size()
     {
-        return (_debug_time > 0) ? MAVLINK_MSG_ID_NAMED_VALUE_FLOAT_LEN + MAVLINK_NUM_NON_PAYLOAD_BYTES : 0;
+        return (_debug_time > 0) ? MAVLINK_MSG_ID_Filter_Angle_LEN + MAVLINK_NUM_NON_PAYLOAD_BYTES : 0;
     }
 
 private:
@@ -3169,17 +3169,15 @@ protected:
     {
         struct vehicle_filter_attitude_s debug;
 
-        if (_debug_sub->update(&_debug_time, &debug)) {
-            mavlink_named_value_float_t msg = {};
-
+        if (_debug_sub->update(&_debug_time, &debug)) {           
+            mavlink_filter_angle_t msg = {};
             msg.time_boot_ms = debug.timestamp_ms;
             memcpy(msg.name, debug.key, sizeof(msg.name));
             /* enforce null termination */
             msg.name[sizeof(msg.name) - 1] = '\0';
             msg.value = debug.value;
 
-            mavlink_msg_named_value_float_send_struct(_mavlink->get_channel(), &msg);
-
+            mavlink_msg_filter_angle_send_struct(_mavlink->get_channel(), &msg);
             return true;
         }
 
@@ -3307,13 +3305,13 @@ protected:
 		struct debug_value_s debug = {};
 
 		if (_debug_sub->update(&_debug_time, &debug)) {
-			mavlink_debug_t msg = {};
+            mavlink_debug_t msg = {};
 
 			msg.time_boot_ms = debug.timestamp_ms;
 			msg.ind = debug.ind;
 			msg.value = debug.value;
 
-			mavlink_msg_debug_send_struct(_mavlink->get_channel(), &msg);
+            mavlink_msg_debug_send_struct(_mavlink->get_channel(), &msg);
 
 			return true;
 		}

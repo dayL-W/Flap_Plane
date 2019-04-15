@@ -54,8 +54,7 @@
 #include <uORB/topics/debug_key_value.h>
 #include <uORB/topics/vehicle_filter_attitude.h>
 #include <uORB/topics/vehicle_attitude.h>
-#include <mathlib/math/filter/LowPassFilter2p.hpp>
-#include <matrix/matrix/math.hpp>
+#include <queue>
 static bool thread_should_exit = false;		/**< daemon exit flag */
 static bool thread_running = false;		/**< daemon status flag */
 static int daemon_task;				/**< Handle of daemon task / thread */
@@ -63,12 +62,12 @@ static int daemon_task;				/**< Handle of daemon task / thread */
 /**
  * daemon management function.
  */
-extern "C" __EXPORT int filter_angle_main(int argc, char *argv[]);
+extern "C" __EXPORT int mavlink_debug_main(int argc, char *argv[]);
 
 /**
  * Mainloop of daemon.
  */
-int filter_angle_thread_main(int argc, char *argv[]);
+int mavlink_debug_thread_main(int argc, char *argv[]);
 
 /**
  * Print the correct usage.
@@ -93,7 +92,7 @@ usage(const char *reason)
  * The actual stack size should be set in the call
  * to task_create().
  */
-int filter_angle_main(int argc, char *argv[])
+int mavlink_debug_main(int argc, char *argv[])
 {
 	if (argc < 2) {
 		usage("missing command");
@@ -109,11 +108,11 @@ int filter_angle_main(int argc, char *argv[])
 		}
 
 		thread_should_exit = false;
-		daemon_task = px4_task_spawn_cmd("filter_angle",
+		daemon_task = px4_task_spawn_cmd("mavlink_debug",
 						 SCHED_DEFAULT,
 						 SCHED_PRIORITY_DEFAULT,
 						 2000,
-                         filter_angle_thread_main,
+                         mavlink_debug_thread_main,
 						 (argv) ? (char *const *)&argv[2] : (char *const *)NULL);
 		return 0;
 	}
@@ -194,12 +193,10 @@ public:
     }
 };
 
-int filter_angle_thread_main(int argc, char *argv[])
+int mavlink_debug_thread_main(int argc, char *argv[])
 {
     queue roll_queue;
     roll_queue.init(200);
-
-    math::LowPassFilter2p roll_lp(100,10);
     //订阅角度
     int atti_sub_fd = orb_subscribe(ORB_ID(vehicle_attitude));
     int error_counter = 0;
@@ -209,9 +206,10 @@ int filter_angle_thread_main(int argc, char *argv[])
     fds[0].events = POLLIN;
     //公告滤波后的角度
     //struct vehicle_filter_attitude_s fa_dgb ={.key = "filter", .value=0.0f, .rollspeed=0.0f};
-    struct debug_key_value_s fa_dgb ={0,0,0,"filter"};
+    struct vehicle_filter_attitude_s fa_dgb ={0,0,0,0,0,0,0,0,0,0,0,0,0,0,"mav_debug",0,0};
+    //struct debug_key_value_s fa_dgb = {0,0,0,"mav_debug"};
 
-    orb_advert_t pub_dbg = orb_advertise(ORB_ID(debug_key_value), &fa_dgb);
+    orb_advert_t pub_dbg = orb_advertise(ORB_ID(vehicle_filter_attitude), &fa_dgb);
 	warnx("[daemon] starting\n");
 
 	thread_running = true;
@@ -239,9 +237,7 @@ int filter_angle_thread_main(int argc, char *argv[])
                 fa_dgb.timestamp_ms = timestamp_ms;
                 fa_dgb.value = roll_queue.get_mean_value(euler.phi());
                 //fa_dgb.value = (float)0.92*fa_dgb.value + (float)0.08*euler.phi();
-                //fa_dgb.value = roll_lp.apply(euler.phi());
-                orb_publish(ORB_ID(debug_key_value), pub_dbg, &fa_dgb);
-                //PX4_INFO("roll: %d: %1.3f",roll_queue.size(), (double)roll_queue.sum);
+                orb_publish(ORB_ID(vehicle_filter_attitude), pub_dbg, &fa_dgb);
             }
         }
 	}

@@ -165,6 +165,7 @@ set(config_module_list
         examples/get_land_state
         examples/get_rc
         examples/filter_angle
+        examples/mavlink_debug
 
 	# Tutorial code from
 	# https://px4.io/dev/debug_values

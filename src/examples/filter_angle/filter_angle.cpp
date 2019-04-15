@@ -137,9 +137,66 @@ int filter_angle_main(int argc, char *argv[])
 	return 1;
 }
 
+class queue
+{
+public:
+    float* arr;
+    int front;
+    int rear;
+    int max_size;
+    float sum;
+public:
+    void init(int size)
+    {
+        arr = new float[size];
+        max_size = size;
+        front = 0;
+        rear = 0;
+        sum = 0;
+    }
+    void push(float data)
+    {
+        if(full())
+            return;
+        arr[rear++] = data;
+        rear = rear % max_size;
+        sum += data;
+    }
+    void pop()
+    {
+        if(empty())
+            return;
+        sum -= arr[front];
+        front += 1;
+        front = front % max_size;
+    }
+    bool empty()
+    {
+        return front == rear;
+    }
+    bool full()
+    {
+        return front == (rear + 1) % max_size;
+    }
+
+    int size()
+    {
+        return (rear - front + max_size) % max_size;
+    }
+    float get_mean_value(float data)
+    {
+        //pop if full
+        if(full())
+            pop();
+        push(data);
+        return sum / size();
+    }
+};
+
 int filter_angle_thread_main(int argc, char *argv[])
 {
-
+    queue roll_queue;
+    roll_queue.init(200);
     //订阅角度
     int atti_sub_fd = orb_subscribe(ORB_ID(vehicle_attitude));
     int error_counter = 0;
@@ -177,9 +234,10 @@ int filter_angle_thread_main(int argc, char *argv[])
                 matrix::Eulerf euler = matrix::Quatf(raw.q);
 
                 fa_dgb.timestamp_ms = timestamp_ms;
-                fa_dgb.value = (float)0.92*fa_dgb.value + (float)0.08*euler.phi();
+                fa_dgb.value = roll_queue.get_mean_value(euler.phi());
                 //fa_dgb.value = (float)0.92*fa_dgb.value + (float)0.08*euler.phi();
                 orb_publish(ORB_ID(debug_key_value), pub_dbg, &fa_dgb);
+                PX4_INFO("roll: %d: %1.3f",roll_queue.size(), (double)roll_queue.sum);
             }
         }
 	}

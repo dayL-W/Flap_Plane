@@ -402,6 +402,62 @@ FixedwingAttitudeControl::vehicle_land_detected_poll()
 	}
 }
 
+class queue
+{
+private:
+    float* arr;
+    int front;
+    int rear;
+    int max_size;
+    float sum;
+public:
+    void init(int size)
+    {
+        arr = new float[size];
+        max_size = size;
+        front = 0;
+        rear = 0;
+        sum = 0;
+    }
+    void push(float data)
+    {
+        if(full())
+            return;
+        arr[rear++] = data;
+        rear = rear % max_size;
+        sum += data;
+    }
+    void pop()
+    {
+        if(empty())
+            return;
+        sum -= arr[front];
+        front += 1;
+        front = front % max_size;
+    }
+    bool empty()
+    {
+        return front == rear;
+    }
+    bool full()
+    {
+        return front == (rear + 1) % max_size;
+    }
+
+    int size()
+    {
+        return (rear - front + max_size) % max_size;
+    }
+    float get_mean_value(float data)
+    {
+        //pop if full
+        if(full())
+            pop();
+        push(data);
+        return sum / size();
+    }
+};
+
 void FixedwingAttitudeControl::run()
 {
 	/*
@@ -417,6 +473,10 @@ void FixedwingAttitudeControl::run()
 	_vehicle_land_detected_sub = orb_subscribe(ORB_ID(vehicle_land_detected));
 	_battery_status_sub = orb_subscribe(ORB_ID(battery_status));
 
+    queue roll_qu, pitch_qu, yaw_qu;
+    roll_qu.init(50);
+    pitch_qu.init(50);
+    yaw_qu.init(50);
 	parameters_update();
 
 	/* get an initial update for all sensor and status data */
@@ -627,9 +687,12 @@ void FixedwingAttitudeControl::run()
 
 				/* Prepare data for attitude controllers */
 				struct ECL_ControlData control_input = {};
-				control_input.roll = euler_angles.phi();
-				control_input.pitch = euler_angles.theta();
-				control_input.yaw = euler_angles.psi();
+//                control_input.roll = roll_qu.get_mean_value(euler_angles.phi());
+//				control_input.pitch = roll_qu.get_mean_value(euler_angles.theta());
+//				control_input.yaw = roll_qu.get_mean_value(euler_angles.psi());
+                control_input.roll = euler_angles.phi();
+                control_input.pitch = euler_angles.theta();
+                control_input.yaw = euler_angles.psi();
 				control_input.body_x_rate = _att.rollspeed;
 				control_input.body_y_rate = _att.pitchspeed;
 				control_input.body_z_rate = _att.yawspeed;

@@ -3176,12 +3176,7 @@ protected:
             /* enforce null termination */
             msg.name[sizeof(msg.name) - 1] = '\0';
             msg.value = debug.value;
-            msg.roll = 0;
-            msg.pitch = 0;
-            msg.yaw = 0;
-            msg.roll_filt = 0;
-            msg.pitch_filt = 0;
-            msg.yaw_filt = 0;
+
 
             mavlink_msg_filter_angle_send_struct(_mavlink->get_channel(), &msg);
             return true;

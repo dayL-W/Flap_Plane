@@ -206,7 +206,7 @@ int mavlink_debug_thread_main(int argc, char *argv[])
     fds[0].events = POLLIN;
     //公告滤波后的角度
     //struct vehicle_filter_attitude_s fa_dgb ={.key = "filter", .value=0.0f, .rollspeed=0.0f};
-    struct vehicle_filter_attitude_s fa_dgb ={0,0,0,0,0,0,0,0,0,0,0,0,0,0,"mav_debug",0,0};
+    struct vehicle_filter_attitude_s fa_dgb ={0,0,0,"mav_debug"};
     //struct debug_key_value_s fa_dgb = {0,0,0,"mav_debug"};
 
     orb_advert_t pub_dbg = orb_advertise(ORB_ID(vehicle_filter_attitude), &fa_dgb);

@@ -123,7 +123,6 @@ MissionBlock::is_mission_item_reached()
 	}
 
 	hrt_abstime now = hrt_absolute_time();
-
 	if (!_navigator->get_land_detected()->landed && !_waypoint_position_reached) {
 
 		float dist = -1.0f;
@@ -303,7 +302,6 @@ MissionBlock::is_mission_item_reached()
 				}
 
 			}
-
 			if (dist >= 0.0f && dist <= mission_acceptance_radius
 			    && dist_z <= _navigator->get_altitude_acceptance_radius()) {
 				_waypoint_position_reached = true;
@@ -319,7 +317,6 @@ MissionBlock::is_mission_item_reached()
 	/* Check if the waypoint and the requested yaw setpoint. */
 
 	if (_waypoint_position_reached && !_waypoint_yaw_reached) {
-
 		if ((_navigator->get_vstatus()->is_rotary_wing
 		     || (_mission_item.nav_cmd == NAV_CMD_LOITER_TO_ALT && _mission_item.force_heading))
 		    && PX4_ISFINITE(_mission_item.yaw)) {
@@ -389,7 +386,6 @@ MissionBlock::is_mission_item_reached()
 								   bearing, curr_sp.loiter_radius,
 								   &curr_sp.lat, &curr_sp.lon);
 			}
-
 			return true;
 		}
 	}

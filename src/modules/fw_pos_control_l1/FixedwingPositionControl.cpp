@@ -1425,14 +1425,15 @@ FixedwingPositionControl::control_landing(const Vector2f &curr_pos, const Vector
 	/* Check if we should start flaring with a vertical and a
 	 * horizontal limit (with some tolerance)
 	 * The horizontal limit is only applied when we are in front of the wp
-	 */
+     * 分别对glide slope和land flaring做控制
+     */
 	if (((_global_pos.alt < terrain_alt + _landingslope.flare_relative_alt()) &&
 	     (wp_distance_save < _landingslope.flare_length() + 5.0f)) ||
 	    _land_noreturn_vertical) {  //checking for land_noreturn to avoid unwanted climb out
 
 		/* land with minimal speed */
 
-		/* force TECS to only control speed with pitch, altitude is only implicitly controlled now */
+        /* force TECS to only control speed with pitch, altitude is only implicitly controlled now */
 		// _tecs.set_speed_weight(2.0f);
 
 		/* kill the throttle if param requests it */
@@ -1461,7 +1462,7 @@ FixedwingPositionControl::control_landing(const Vector2f &curr_pos, const Vector
 			flare_curve_alt_rel = 0.0f; // stay on ground
 			_land_stayonground = true;
 		}
-
+        /* 计算着陆的空速和巡航油门，默认空速和油门是10*1.3和0.1*/
 		const float airspeed_land = _parameters.land_airspeed_scale * _parameters.airspeed_min;
 		const float throttle_land = _parameters.throttle_min + (_parameters.throttle_max - _parameters.throttle_min) * 0.1f;
 

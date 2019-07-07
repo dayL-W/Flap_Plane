@@ -58,7 +58,7 @@ RunwayTakeoff::RunwayTakeoff(ModuleParams *parent) :
 	_initialized_time(0),
 	_init_yaw(0),
 	_climbout(false),
-    _throttle_ramp_time(3 * 1e6)
+    _throttle_ramp_time(5 * 1e6)
 {
 }
 

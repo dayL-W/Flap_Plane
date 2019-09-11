@@ -164,7 +164,7 @@ out:
 static bool imuConsistencyCheck(orb_advert_t *mavlink_log_pub, vehicle_status_s &status, bool report_status)
 {
 	bool success = true; // start with a pass and change to a fail if any test fails
-	float test_limit = 1.0f; // pass limit re-used for each test
+    float test_limit = 1.5f; // pass limit re-used for each test
 
 	// Get sensor_preflight data if available and exit with a fail recorded if not
 	int sensors_sub = orb_subscribe(ORB_ID(sensor_preflight));
